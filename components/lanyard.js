@@ -49,7 +49,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   const [hovered, hover] = useState(false);
   const [isSmall, setIsSmall] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
 
-  const ropeLength = 0.5;
+  const ropeLength = 1;
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], ropeLength]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], ropeLength]);
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], ropeLength]);
@@ -106,7 +106,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
-            scale={2.25}
+            scale={3}
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}

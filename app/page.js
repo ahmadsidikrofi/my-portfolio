@@ -4,6 +4,7 @@ import Footer from "@/components/footer"
 import Header from "@/components/header"
 import Lanyard from "@/components/lanyard"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
 import { useState, useEffect, useRef, Suspense } from "react"
 
@@ -224,16 +225,13 @@ export default function TerminalPortfolio() {
 
   return (
     <div className="min-h-screen overflow-hidden  bg-black font-mono">
-      <div>
-        <Header />
-      </div>
-      <div className=" text-[#39FF14] font-mono flex p-4 h-[78vh]">
+      <Header />
+      <div className=" text-[#39FF14] font-mono flex h-[84vh]">
         {/* Left Column - Lanyard */}
         <div className="w-2/3 hidden lg:flex items-center justify-center p-4">
           <Lanyard />
-          {/* <Suspense fallback={<div className="text-green-500">Loading 3D Card...</div>}>
-          </Suspense> */}
         </div>
+        <Separator orientation="vertical" className="bg-green-800" />
 
         {/* Right Column - Terminal */}
         <div className="w-full lg:w-full flex flex-col p-4 sm:p-8">
@@ -308,9 +306,7 @@ export default function TerminalPortfolio() {
           </ScrollArea>
         </div>
       </div>
-      <div>
-        <Footer />
-      </div>
+      <Footer />
     </div>
   )
 }
