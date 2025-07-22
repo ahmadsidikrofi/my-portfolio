@@ -11,7 +11,7 @@ export const maxDuration = 30;
 
 const generatedId = () => Math.random().toString(36).slice(2, 15)
 
-const buildAIGenerativePrompt = (messages: Message[]): Message[] => [
+const buildAIGenerativePrompt = (messages) => [
   {
     id: generatedId(),
     role: 'user',
@@ -24,7 +24,7 @@ const buildAIGenerativePrompt = (messages: Message[]): Message[] => [
   }))
 ]
 
-export async function POST (req: Request) {
+export async function POST (req) {
   const { messages } = await req.json();
     const result = streamText({
       model: google('gemini-2.0-flash'),
