@@ -2,7 +2,7 @@ import { ScrollArea } from "./ui/scroll-area";
 
 const Terminal = ({ 
     activeSection, 
-    handleKeyPress, 
+    handleKeyDown, 
     handleNavClick, 
     terminalRef, 
     focusInput, 
@@ -46,11 +46,11 @@ const Terminal = ({
                 {m.role === "user" ? (
                   <p className="my-6">
                     <span className="text-[#00b7ff] mr-2">rofi@portfolio:~$</span>
-                    <span className="text-white">{m.content}</span>
+                    <span className="text-[#39FF14]">{m.content}</span>
                     {/* <span className="text-white">{line.command}</span> */}
                   </p>
                 ) : (
-                  <p className="text-[#39FF14]">{m.content}</p>
+                  <p className="text-white">{m.content}</p>
                   // <p className="text-[#39FF14]">{line.content}</p>
                 )}
               </div>
@@ -63,7 +63,7 @@ const Terminal = ({
                 type="text"
                 value={input}
                 onChange={handleInputChange}
-                // onKeyDown={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 className="bg-transparent border border-none outline-none custom-caret text-white font-mono w-full"
                 autoFocus
                 style={{ position: "relative", zIndex: 2, background: "transparent" }}
@@ -73,7 +73,7 @@ const Terminal = ({
                 className="block-caret"
                 style={{
                   position: "absolute",
-                  left: `calc(11em + ${currentCommand.length}ch)`,
+                  left: `calc(11em + ${input.length}ch)`,
                   zIndex: 1,
                   pointerEvents: "none",
                 }}

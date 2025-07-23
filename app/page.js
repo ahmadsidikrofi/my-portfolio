@@ -4,10 +4,8 @@ import Footer from "@/components/footer"
 import Header from "@/components/header"
 import Lanyard from "@/components/lanyard"
 import Terminal from "@/components/terminal"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useChat } from "@ai-sdk/react"
-import Image from "next/image"
 import { useState, useEffect, useRef, Suspense } from "react"
 
 export default function TerminalPortfolio() {
@@ -24,22 +22,30 @@ export default function TerminalPortfolio() {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const inputRef = useRef(null)
   const terminalRef = useRef(null)
-  const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, setMessages, setInput } = useChat({
     api: '/api/chat',
     initialMessages: [
       { id: '0', role: 'assistant', content: "Hi, I'm Rofi-AI. Welcome to Rofi's portfolio." },
       { id: '1', role: 'assistant', content: "Type 'help' for a list of commands, or ask me anything!" },
     ],
+    onFinish: () => {
+      setHistoryIndex(-1)
+    }
   })
 
   const handleTerminalSubmit = (e) => {
     e.preventDefault()
     const command = input.toLowerCase().trim()
+    if (!command) return
+
+    setCommandHistory(prev => [...prev.filter(c => c !== command), command])
+    setHistoryIndex(-1)
+
     if (command === 'clear' || command === 'cls') {
       setMessages([
         { id: 0, role: 'assistant', content: 'Terminal Cleared. How can I assist you?' }
       ])
-      handleInputChange({ target: { value: '' } })
+      setInput('')
       return
     }
 
@@ -61,7 +67,7 @@ export default function TerminalPortfolio() {
           { id: crypto.randomUUID(), role: 'user', content: input },
           ...helpOutput
       ]);
-      handleInputChange({ target: { value: '' } }); 
+      setInput('')
       return;
     }
 
@@ -75,10 +81,10 @@ export default function TerminalPortfolio() {
   //   // Add the command to history
   //   newHistory.push({ type: "command", prompt: `rofi@portfolio:~$`, command: cmd  })
 
-  //   if (command && command !== "clear" ) {
-  //     setCommandHistory(prev => [...prev.filter(c => c !== command), command])
-  //   }
-  //   setHistoryIndex(-1)
+    // if (command && command !== "clear" ) {
+    //   setCommandHistory(prev => [...prev.filter(c => c !== command), command])
+    // }
+    // setHistoryIndex(-1)
 
   //   if (command === "clear" || command === "cls") {
   //     setTerminalHistory([])
@@ -103,16 +109,32 @@ export default function TerminalPortfolio() {
   //   setCurrentCommand("")
   // }
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleCommand(currentCommand)
-    }
-    else if (e.key === "ArrowUp") {
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowUp') {
       e.preventDefault()
-      if (commandHistory.length === 0) return
+      if (commandHistory.length === 0) return;
       const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1)
       setHistoryIndex(newIndex)
-      setCurrentCommand(commandHistory[newIndex])
+      setInput(commandHistory[newIndex] || '')
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (historyIndex === -1) return
+      const newIndex = historyIndex + 1
+      if (newIndex >= commandHistory.length) {
+        setHistoryIndex(-1)
+        setInput('')
+      } else {
+        setHistoryIndex(newIndex)
+        setInput(commandHistory[newIndex] || '')
+      }
+    } else if (e.ctrlKey && e.key === 'a') {
+      e.preventDefault();
+      const selectionStart = inputRef.current.selectionStart;
+      const selectionEnd = inputRef.current.selectionEnd;
+      const value = inputRef.current.value;
+      const newValue = value.substring(0, selectionStart) + value.substring(selectionEnd);
+      setInput(newValue);
+      inputRef.current.setSelectionRange(selectionStart, selectionStart);
     }
   }
 
@@ -151,7 +173,7 @@ export default function TerminalPortfolio() {
         <Terminal
           activeSection={activeSection}
           handleNavClick={handleNavClick}
-          handleKeyPress={handleKeyPress}
+          handleKeyDown={handleKeyDown}
           terminalRef={terminalRef}
           focusInput={focusInput}
           terminalHistory={terminalHistory}
