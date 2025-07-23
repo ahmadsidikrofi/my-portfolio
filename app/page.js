@@ -6,6 +6,7 @@ import Lanyard from "@/components/lanyard"
 import Terminal from "@/components/terminal"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useChat } from "@ai-sdk/react"
 import Image from "next/image"
 import { useState, useEffect, useRef, Suspense } from "react"
 
@@ -23,172 +24,84 @@ export default function TerminalPortfolio() {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const inputRef = useRef(null)
   const terminalRef = useRef(null)
+  const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      { id: '0', role: 'assistant', content: "Hi, I'm Rofi-AI. Welcome to Rofi's portfolio." },
+      { id: '1', role: 'assistant', content: "Type 'help' for a list of commands, or ask me anything!" },
+    ],
+  })
 
-  const commands = {
-    welcome: {
-      output: [
-        "Hi, I'm Rofi, a Software & AI Engineer.",
-        "Welcome to my interactive 'AI powered' portfolio terminal!",
-        "Type 'help' to see available commands."
-      ]
-    },
-    help: {
-      output: [
-        "Available commands:",
-        "  about          - Learn about me",
-        "  projects       - View my projects",
-        "  skills         - See my technical skills",
-        "  experience     - My work experience",
-        "  contact        - How to reach me",
-        "  education      - My educational background",
-        "  certifications - View my certifications",
-        "  leadership     - Leadership and community involvement",
-        "  clear          - Clear the terminal",
-      ],
-    },
-    about: {
-      output: [
-        "About Rofi:",
-        "",
-        "I am a passionate Software & AI Engineer with expertise in building",
-        "scalable applications and intelligent systems. I love solving complex",
-        "problems and creating innovative solutions that make a difference.",
-        "",
-        "When I'm not coding, you can find me exploring new technologies,",
-        "contributing to open source projects, or mentoring fellow developers.",
-      ],
-    },
-    projects: {
-      output: [
-        "Recent Projects:",
-        "",
-        "1. AI-Powered Analytics Dashboard",
-        "   - Built with React, Python, and TensorFlow",
-        "   - Real-time data processing and visualization",
-        "",
-        "2. Distributed Microservices Platform",
-        "   - Node.js, Docker, Kubernetes",
-        "   - Handles 10M+ requests per day",
-        "",
-        "3. Machine Learning Pipeline",
-        "   - Python, Apache Airflow, AWS",
-        "   - Automated model training and deployment",
-      ],
-    },
-    skills: {
-      output: [
-        "Technical Skills:",
-        "",
-        "Languages:     JavaScript, TypeScript, Python, Java, Go",
-        "Frontend:      React, Next.js, Vue.js, HTML5, CSS3",
-        "Backend:       Node.js, Express, Django, FastAPI",
-        "Databases:     PostgreSQL, MongoDB, Redis, Elasticsearch",
-        "Cloud:         AWS, Google Cloud, Azure, Docker, Kubernetes",
-        "AI/ML:         TensorFlow, PyTorch, Scikit-learn, OpenAI API",
-        "Tools:         Git, Jenkins, Terraform, Grafana, Prometheus",
-      ],
-    },
-    experience: {
-      output: [
-        "Work Experience:",
-        "",
-        "Senior Software Engineer | TechCorp (2022 - Present)",
-        "• Lead development of AI-powered features",
-        "• Mentor junior developers and conduct code reviews",
-        "• Architected scalable microservices infrastructure",
-        "",
-        "Software Engineer | StartupXYZ (2020 - 2022)",
-        "• Built full-stack web applications using React and Node.js",
-        "• Implemented CI/CD pipelines and automated testing",
-        "• Collaborated with cross-functional teams on product development",
-      ],
-    },
-    contact: {
-      output: [
-        "Contact Information:",
-        "",
-        "Email:     ahmadsidikrofiudin@email.com",
-        "LinkedIn:  linkedin.com/in/ahmad-sidik-rofiudin-6b2b58217/",
-        "GitHub:    github.com/ahmadsidikrofi",
-        "",
-        "Feel free to reach out for collaboration opportunities!",
-      ],
-    },
-    education: {
-      output: [
-        "Education:",
-        "",
-        "Master of Science in Computer Science",
-        "Stanford University (2018 - 2020)",
-        "• Specialization in Artificial Intelligence",
-        "• GPA: 3.9/4.0",
-        "",
-        "Bachelor of Science in Software Engineering",
-        "University of Technology (2014 - 2018)",
-        "• Magna Cum Laude",
-        "• President of Computer Science Society",
-      ],
-    },
-    certifications: {
-      output: [
-        "Certifications:",
-        "",
-        "• AWS Certified Solutions Architect - Professional",
-        "• Google Cloud Professional Machine Learning Engineer",
-        "• Certified Kubernetes Administrator (CKA)",
-        "• MongoDB Certified Developer",
-        "• Scrum Master Certified (SMC)",
-        "• TensorFlow Developer Certificate",
-      ],
-    },
-    leadership: {
-      output: [
-        "Leadership & Community:",
-        "",
-        "• Tech Lead for 15+ person engineering team",
-        "• Organizer of local JavaScript meetup (500+ members)",
-        "• Mentor at Code for Good hackathons",
-        "• Speaker at 10+ tech conferences",
-        "• Open source contributor (50+ repositories)",
-        "• Volunteer coding instructor for underserved communities",
-      ],
-    },
-  }
-
-  const handleCommand = (cmd) => {
-    const command = cmd.toLowerCase().trim()
-    let newHistory = [...terminalHistory]
-
-    // Add the command to history
-    newHistory.push({ type: "command", prompt: `rofi@portfolio:~$`, command: cmd  })
-
-    if (command && command !== "clear" ) {
-      setCommandHistory(prev => [...prev.filter(c => c !== command), command])
-    }
-    setHistoryIndex(-1)
-
-    if (command === "clear" || command === "cls") {
-      setTerminalHistory([])
-      setCurrentCommand("")
+  const handleTerminalSubmit = (e) => {
+    e.preventDefault()
+    const command = input.toLowerCase().trim()
+    if (command === 'clear' || command === 'cls') {
+      setMessages([
+        { id: 0, role: 'assistant', content: 'Terminal Cleared. How can I assist you?' }
+      ])
+      handleInputChange({ target: { value: '' } })
       return
     }
 
-    if (commands[command]) {
-      const output = commands[command].output
-      const outputLines = output.map((line => ({ type: 'output', content: line })))
-      newHistory = [...newHistory, ...outputLines]
-      setActiveSection(command)
-    } else if (command) {
-      newHistory.push({ type: "output", content: `Command not found: ${command}` });
-      newHistory.push({ type: "output", content: "Type 'help' to see available commands." });
+    if (command === 'help') {
+      const helpOutput = [
+        "Available commands:",
+        "  clear         - Clear the terminal.",
+        "",
+        "You can also ask me anything about Rofi's portfolio!",
+        "e.g., 'what projects has rofi worked on?' or 'tell me about his skills'",
+      ].map(line => ({
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: line
+      }));
+        
+      setMessages([
+          ...messages,
+          { id: crypto.randomUUID(), role: 'user', content: input },
+          ...helpOutput
+      ]);
+      handleInputChange({ target: { value: '' } }); 
+      return;
     }
-    setTerminalHistory(newHistory);
-    setCurrentCommand("");
 
-    // newHistory.push({ type: "output", content: "" })
-    setTerminalHistory(newHistory)
-    setCurrentCommand("")
+    handleSubmit(e)
   }
+
+  // const handleCommand = (cmd) => {
+  //   const command = cmd.toLowerCase().trim()
+  //   let newHistory = [...terminalHistory]
+
+  //   // Add the command to history
+  //   newHistory.push({ type: "command", prompt: `rofi@portfolio:~$`, command: cmd  })
+
+  //   if (command && command !== "clear" ) {
+  //     setCommandHistory(prev => [...prev.filter(c => c !== command), command])
+  //   }
+  //   setHistoryIndex(-1)
+
+  //   if (command === "clear" || command === "cls") {
+  //     setTerminalHistory([])
+  //     setCurrentCommand("")
+  //     return
+  //   }
+
+  //   if (commands[command]) {
+  //     const output = commands[command].output
+  //     const outputLines = output.map((line => ({ type: 'output', content: line })))
+  //     newHistory = [...newHistory, ...outputLines]
+  //     setActiveSection(command)
+  //   } else if (command) {
+  //     newHistory.push({ type: "output", content: `Command not found: ${command}` });
+  //     newHistory.push({ type: "output", content: "Type 'help' to see available commands." });
+  //   }
+  //   setTerminalHistory(newHistory);
+  //   setCurrentCommand("");
+
+  //   // newHistory.push({ type: "output", content: "" })
+  //   setTerminalHistory(newHistory)
+  //   setCurrentCommand("")
+  // }
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -245,6 +158,10 @@ export default function TerminalPortfolio() {
           inputRef={inputRef}
           currentCommand={currentCommand}
           setCurrentCommand={setCurrentCommand}
+          messages={messages}
+          handleTerminalSubmit={handleTerminalSubmit}
+          input={input}
+          handleInputChange={handleInputChange}
         />
       </div>
       <Footer />
