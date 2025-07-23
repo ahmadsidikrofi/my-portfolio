@@ -1,6 +1,5 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { convertToCoreMessages, streamText, Message} from 'ai';
-import { initialPrompt } from '@/lib/initialPrompt';
 import { portfolioSystemPrompt } from '@/lib/portfolio-data';
 
 const google = createGoogleGenerativeAI({
