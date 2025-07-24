@@ -34,24 +34,24 @@ const Terminal = ({
             <div key={m.id || index} className="whitespace-pre-wrap break-words">
               {m.role === "user" ? (
                 <>
-                  <p className="mt-6 mb-2">
+                  <p className="mt-6 mb-2 text-sm">
                     <span className="text-[#00b7ff] mr-2">rofi@portfolio:~$</span>
                     <span className="text-[#39FF14]">{m.content}</span>
                   </p>
                   {/* Show error message jika command ini adalah error command */}
                   {errorCommands[m.id] && (
                     <div>
-                      <p className="text-red-500 mb-6">
+                      <p className="text-red-500 mb-6 text-sm">
                         bash: {errorCommands[m.id]}: command not found
                       </p>
                       {isUserMessagePending && (
-                        <p className="text-white mb-6">Fetching information from AI assistant. . .</p>
+                        <p className="text-white mb-6 text-sm">Fetching information from AI assistant. . .</p>
                       )}
                     </div>
                   )}
                 </>
               ) : (
-                <p className={m.type === 'error' ? 'text-red-500' : 'text-white'}>
+                <p className={`${m.type === 'error' ? 'text-red-500' : 'text-white'} text-sm`}>
                   {!isDelaying && m.content}
                 </p>
               )}

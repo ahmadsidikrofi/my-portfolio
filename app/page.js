@@ -134,7 +134,7 @@ export default function TerminalPortfolio() {
       <Header />
       <div className=" text-[#39FF14] font-mono flex h-[84vh]">
         {/* Left Column - Lanyard */}
-        <div className="bg-gradient-to-tl from-black to-gray-800 w-2/3 hidden lg:flex items-center justify-center p-4">
+        <div className="bg-gradient-to-tl from-black to-gray-800 w-2/3 hidden lg:flex items-center justify-center">
           <Lanyard />
         </div>
         <Separator orientation="vertical" className="bg-green-800" />
