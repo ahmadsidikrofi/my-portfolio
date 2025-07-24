@@ -26,7 +26,9 @@ export default function TerminalPortfolio() {
   const inputRef = useRef(null)
   const [isFetching, setIsFetching] = useState(false)
   const [errorCommands, setErrorCommands] = useState({})
-  const [isDelaying, setIsDelaying] = useState(false)
+  const [delayingIds, setDelayingIds] = useState(new Set())
+  const [finishedAnimationIds, setFinishedAnimationIds] = useState(new Set())
+  const [animationCompletedIds, setAnimationCompletedIds] = useState(new Set())
 
   const { messages, input, handleInputChange, setMessages, setInput, append } = useChat({
     api: '/api/chat',
@@ -37,11 +39,33 @@ export default function TerminalPortfolio() {
       { id: '3', role: 'assistant', content: "Welcome to my interactive 'AI powered' portfolio terminal!" },
       { id: '4', role: 'assistant', content: "Type 'help' for a list of commands, or ask me anything!" },
     ],
-    onFinish: () => {
-      setHistoryIndex(-1)
-      setIsFetching(false)
+    onFinish: (message) => {
+      console.log('onFinish called for:', message.id);
+      setHistoryIndex(-1);
+      setIsFetching(false);
     }
   })
+
+  useEffect(() => {
+  // Cari message assistant yang belum ada di finishedAnimationIds
+  const newFinishedMessages = messages.filter(m => 
+    m.role === 'assistant' && 
+    !['0', '1', '2', '3', '4'].includes(m.id) && 
+    !finishedAnimationIds.has(m.id) &&
+    m.content && // pastikan ada content
+    !delayingIds.has(m.id) // tidak sedang delay
+  );
+
+  if (newFinishedMessages.length > 0) {
+    console.log('Found new finished messages:', newFinishedMessages.map(m => m.id));
+    
+    setFinishedAnimationIds(prev => {
+      const newSet = new Set(prev);
+      newFinishedMessages.forEach(m => newSet.add(m.id));
+      return newSet;
+    });
+  }
+}, [messages, delayingIds, finishedAnimationIds]);
 
   const handleTerminalSubmit = (e) => {
     e.preventDefault()
@@ -54,29 +78,34 @@ export default function TerminalPortfolio() {
     if (command === 'clear' || command === 'cls') {
       setMessages([])
       setInput('')
+      // Clear semua state
+      setErrorCommands({})
+      setDelayingIds(new Set())
+      setFinishedAnimationIds(new Set())
       return
     }
 
     const isLocalCommands = localCommands.includes(command)
 
-    const userMessage = { 
-      id: crypto.randomUUID(), 
-      role: 'user', 
-      content: input 
-    }
-    
     if (isLocalCommands) {
       append({ role: 'user', content: input })
     } else {
       const messageId = Date.now().toString()
-      setIsDelaying(true)
-      setTimeout(() => {
-        setIsDelaying(false);
-      }, 3000)
+      
       setErrorCommands(prev => ({
         ...prev,
         [messageId]: command
       }))
+      
+      setDelayingIds(prev => new Set(prev).add(messageId))
+      
+      setTimeout(() => {
+        setDelayingIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(messageId);
+          return newSet;
+        });
+      }, 3000)
       
       append({ 
         role: 'user', 
@@ -151,7 +180,10 @@ export default function TerminalPortfolio() {
           handleInputChange={handleInputChange}
           isFetching={isFetching}
           errorCommands={errorCommands}
-          isDelaying={isDelaying}
+          delayingIds={delayingIds}
+          finishedAnimationIds={finishedAnimationIds}
+          animationCompletedIds={animationCompletedIds}
+          setAnimationCompletedIds={setAnimationCompletedIds}
         />
       </div>
       <Footer />
