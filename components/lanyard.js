@@ -12,7 +12,7 @@ const lanyardTexture_URL = "/lanyard.png";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
-export default function Lanyard({ position = [0, 0, 20], gravity = [0, -70, 0], fov = 20, transparent = true }) {
+export default function Lanyard({ position = [0, 0, 20], gravity = [0, -70, 0], fov = 18, transparent = true }) {
   return (
     <div className="lanyard-wrapper">
       <Canvas

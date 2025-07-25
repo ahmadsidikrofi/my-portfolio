@@ -68,7 +68,7 @@ const Terminal = ({
                           <CustomTypingText
                             text={completedMessages[m.id]}
                             messageId={m.id}
-                            typingSpeed={10}
+                            typingSpeed={40}
                             cursorCharacter="█"
                             cursorClassName="text-[#39FF14] animate-pulse"
                             showCursor={true}
