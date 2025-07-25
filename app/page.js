@@ -75,8 +75,10 @@ export default function TerminalPortfolio() {
     const isLocalCommands = localCommands.includes(command)
 
     if (isLocalCommands) {
+      setIsFetching(true)
       append({ role: 'user', content: input })
     } else {
+      setIsFetching(true)
       const messageId = Date.now().toString()
       
       setErrorCommands(prev => ({
@@ -166,6 +168,7 @@ export default function TerminalPortfolio() {
           input={input}
           handleInputChange={handleInputChange}
           isFetching={isFetching}
+          setIsFetching={setIsFetching}
           errorCommands={errorCommands}
           delayingIds={delayingIds}
           finishedAnimationIds={finishedAnimationIds}

@@ -9,7 +9,8 @@ const CustomTypingText = ({
   onComplete = null,
   showCursor = false,
   cursorCharacter = '█',
-  cursorClassName = ''
+  cursorClassName = '',
+  setIsFetching
 }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isTypingComplete, setIsTypingComplete] = useState(false);
@@ -18,6 +19,7 @@ const CustomTypingText = ({
   const fullText = Array.isArray(text) ? text.join('\n') : text;
 
   useEffect(() => {
+    setIsFetching(true)
     // Reset state setiap kali 'fullText' yang baru masuk
     setDisplayedText('');
     setIsTypingComplete(false);

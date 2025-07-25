@@ -11,8 +11,8 @@ const Terminal = ({
   input,
   handleInputChange,
   isFetching,
+  setIsFetching,
   errorCommands,
-  isDelaying,
   delayingIds,
   finishedAnimationIds,
   completedMessages
@@ -72,6 +72,7 @@ const Terminal = ({
                             cursorCharacter="█"
                             cursorClassName="text-[#39FF14] animate-pulse"
                             showCursor={true}
+                            setIsFetching={setIsFetching}
                           />
                         ) : (
                           m.content
