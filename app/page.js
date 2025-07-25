@@ -75,10 +75,10 @@ export default function TerminalPortfolio() {
     const isLocalCommands = localCommands.includes(command)
 
     if (isLocalCommands) {
-      setIsFetching(true)
+      setIsFetching(prev => true)
       append({ role: 'user', content: input })
     } else {
-      setIsFetching(true)
+      setIsFetching(prev => true)
       const messageId = Date.now().toString()
       
       setErrorCommands(prev => ({

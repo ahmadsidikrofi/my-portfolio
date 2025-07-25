@@ -19,10 +19,11 @@ const CustomTypingText = ({
   const fullText = Array.isArray(text) ? text.join('\n') : text;
 
   useEffect(() => {
-    setIsFetching(true)
     // Reset state setiap kali 'fullText' yang baru masuk
-    setDisplayedText('');
-    setIsTypingComplete(false);
+    setDisplayedText('')
+    setIsTypingComplete(false)
+    setIsFetching(prev => true)
+
 
     // Jangan jalankan interval jika tidak ada teks
     if (!fullText) {
@@ -37,6 +38,7 @@ const CustomTypingText = ({
       if (currentIndex >= fullText.length) {
         clearInterval(intervalId);
         setIsTypingComplete(true);
+        setIsFetching(prev => false)
         if (onComplete) {
           onComplete();
         }
@@ -45,10 +47,10 @@ const CustomTypingText = ({
 
     // Fungsi cleanup untuk membersihkan interval saat komponen di-unmount
     // atau saat effect berjalan ulang
-    return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId)
 
     // Tambahkan semua props yang digunakan di dalam effect ke dependency array
-  }, [fullText, typingSpeed, onComplete]);
+  }, [fullText, typingSpeed, onComplete, setIsFetching])
 
   return (
     <span className={className}>
