@@ -1,78 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
+// CustomTypingText.js
 
-const CustomTypingText = ({ 
-  text, 
-  className = '', 
-  typingSpeed = 30, 
+import { useState, useEffect } from 'react';
+
+const CustomTypingText = ({
+  text,
+  className = '',
+  typingSpeed = 30,
   onComplete = null,
   showCursor = false,
   cursorCharacter = '█',
   cursorClassName = ''
 }) => {
   const [displayedText, setDisplayedText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
-  const intervalRef = useRef(null);
-  const hasStartedRef = useRef(false);
-  
-  // Gabungkan array text jadi string jika perlu
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+
+  // Mengubah teks array menjadi satu string jika perlu
   const fullText = Array.isArray(text) ? text.join('\n') : text;
-  
-  // Debug log
-  console.log('CustomTypingText rendered with text:', fullText);
-  
+
   useEffect(() => {
-    // Reset jika text berubah
-    if (hasStartedRef.current) {
-      hasStartedRef.current = false;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-    
-    // Prevent restart jika sudah mulai untuk text yang sama
-    if (hasStartedRef.current) return;
-    hasStartedRef.current = true;
-    
-    console.log('Starting animation for:', fullText);
-    
+    // Reset state setiap kali 'fullText' yang baru masuk
     setDisplayedText('');
-    setIsComplete(false);
-    
+    setIsTypingComplete(false);
+
+    // Jangan jalankan interval jika tidak ada teks
+    if (!fullText) {
+      return;
+    }
+
     let currentIndex = 0;
-    
-    intervalRef.current = setInterval(() => {
-      if (currentIndex >= fullText.length) {
-        setIsComplete(true);
-        if (onComplete) onComplete();
-        clearInterval(intervalRef.current);
-        return;
-      }
-      
-      setDisplayedText(fullText.slice(0, currentIndex + 1));
+    const intervalId = setInterval(() => {
       currentIndex++;
-    }, typingSpeed);
-    
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      setDisplayedText(fullText.slice(0, currentIndex));
+
+      if (currentIndex >= fullText.length) {
+        clearInterval(intervalId);
+        setIsTypingComplete(true);
+        if (onComplete) {
+          onComplete();
+        }
       }
-    };
-  }, [fullText, typingSpeed]); // Tambahkan dependencies
-  
-  if (!fullText) {
-    console.log('No text provided to CustomTypingText');
-    return null;
-  }
-  
+    }, typingSpeed);
+
+    // Fungsi cleanup untuk membersihkan interval saat komponen di-unmount
+    // atau saat effect berjalan ulang
+    return () => clearInterval(intervalId);
+
+    // Tambahkan semua props yang digunakan di dalam effect ke dependency array
+  }, [fullText, typingSpeed, onComplete]);
+
   return (
     <span className={className}>
-      {displayedText.split('\n').map((line, index) => (
-        <span key={index}>
-          {line}
-          {index < displayedText.split('\n').length - 1 && <br />}
-        </span>
-      ))}
-      {showCursor && !isComplete && (
+      {/* Render teks yang sedang diketik */}
+      {displayedText}
+      
+      {/* Tampilkan kursor jika diminta dan animasi belum selesai */}
+      {showCursor && !isTypingComplete && (
         <span className={cursorClassName}>{cursorCharacter}</span>
       )}
     </span>

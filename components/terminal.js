@@ -1,3 +1,4 @@
+import CustomTypingText from "./CustomTypingText";
 import { ScrollArea } from "./ui/scroll-area";
 
 const Terminal = ({
@@ -11,7 +12,10 @@ const Terminal = ({
   handleInputChange,
   isFetching,
   errorCommands,
-  isDelaying
+  isDelaying,
+  delayingIds,
+  finishedAnimationIds,
+  completedMessages
 }) => {
   return (
     <div className="w-full lg:w-full flex flex-col p-4">
@@ -29,7 +33,10 @@ const Terminal = ({
       {/* Terminal Content */}
       <ScrollArea className="flex-1 overflow-y-auto pr-2" onClick={focusInput}>
         {messages.map((m, index) => {
-          const isUserMessagePending = errorCommands[m.id] && isDelaying
+          const isUserMessagePending = errorCommands[m.id] && delayingIds.has(m.id)
+          const isInitialMessage = m.role === 'assistant' && !finishedAnimationIds.has(m.id) && ['0','1','2','3','4'].includes(m.id)
+          const isAnimationReady = m.role === 'assistant' && finishedAnimationIds.has(m.id)
+          
           return (
             <div key={m.id || index} className="whitespace-pre-wrap break-words">
               {m.role === "user" ? (
@@ -45,15 +52,33 @@ const Terminal = ({
                         bash: {errorCommands[m.id]}: command not found
                       </p>
                       {isUserMessagePending && (
-                        <p className="text-white mb-6 text-sm">Fetching information from AI assistant. . .</p>
+                        <p className="text-white mb-6 text-sm">AI is thinking. . .</p>
                       )}
                     </div>
                   )}
                 </>
               ) : (
-                <p className={`${m.type === 'error' ? 'text-red-500' : 'text-white'} text-sm`}>
-                  {!isDelaying && m.content}
-                </p>
+                  <>
+                    {isInitialMessage && (
+                      <p className="text-white text-sm">{m.content}</p>
+                    )}
+                    {isAnimationReady && (
+                      <p className="text-white text-sm">
+                        {completedMessages[m.id] ? (
+                          <CustomTypingText
+                            text={completedMessages[m.id]}
+                            messageId={m.id}
+                            typingSpeed={40}
+                            cursorCharacter="█"
+                            cursorClassName="text-[#39FF14] animate-pulse"
+                            showCursor={true}
+                          />
+                        ) : (
+                          m.content
+                        )}
+                      </p>
+                    )}
+                  </>
               )}
             </div>
           )
