@@ -2,7 +2,7 @@ import TextType from "./TextType";
 
 const Header = () => {
     return (
-        <div className="p-2 border-b border-green-800 max-sm:text-center flex flex-col">
+        <div className="p-2 border-b-2 border-green-800 max-sm:text-center flex flex-col">
           <TextType
             text={["Ahmad Sidik Rofiudin"]}
             typingSpeed={75}

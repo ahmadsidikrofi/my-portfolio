@@ -17,7 +17,7 @@ const Terminal = ({
     <div className="w-full lg:w-full flex flex-col p-4">
       {/* Navigation */}
       <nav className="mb-4 shrink-0">
-        <div className="flex flex-wrap gap-x-4 text-sm">
+        <div className="hidden lg:flex flex-wrap gap-x-4 text-sm">
           {localCommands.map((item) => (
             <div key={item}>
               {item} |
