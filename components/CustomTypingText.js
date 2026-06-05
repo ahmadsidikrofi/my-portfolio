@@ -1,6 +1,7 @@
 // CustomTypingText.js
 
 import { useState, useEffect } from 'react';
+import { parseLinks } from '@/lib/utils';
 
 const CustomTypingText = ({
   text,
@@ -55,7 +56,7 @@ const CustomTypingText = ({
   return (
     <span className={className}>
       {/* Render teks yang sedang diketik */}
-      {displayedText}
+      {parseLinks(displayedText)}
       
       {/* Tampilkan kursor jika diminta dan animasi belum selesai */}
       {showCursor && !isTypingComplete && (

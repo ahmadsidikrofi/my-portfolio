@@ -1,5 +1,5 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { convertToCoreMessages, streamText, Message} from 'ai';
+import { convertToCoreMessages, streamText, Message } from 'ai';
 import { portfolioSystemPrompt } from '@/lib/portfolio-data';
 
 const google = createGoogleGenerativeAI({
@@ -24,13 +24,26 @@ const buildAIGenerativePrompt = (messages) => [
   }))
 ]
 
-export async function POST (req) {
-  const { messages } = await req.json();
+export async function POST(req) {
+  try {
+    const { messages } = await req.json();
     const result = streamText({
-      model: google('gemini-2.0-flash'),
+      model: google('gemini-2.5-flash'),
       system: portfolioSystemPrompt,
       messages,
       temperature: 0.7
-  });
-  return result?.toDataStreamResponse();
+    });
+
+    return result?.toDataStreamResponse({
+      getErrorMessage: (error) => {
+        if (error && error.message) {
+          return error.message;
+        }
+        return "Terjadi kesalahan pada AI Server.";
+      }
+    });
+  } catch (e) {
+    console.error("Error in API route:", e);
+    return new Response(JSON.stringify({ error: e.message || "An error occurred" }), { status: 500 });
+  }
 }

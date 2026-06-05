@@ -41,7 +41,7 @@ export default function TerminalPortfolio() {
       { id: '4', role: 'assistant', content: "Type 'help' for a list of commands, or ask me anything!" },
     ],
     onFinish: (message) => {
-      console.log('onFinish called for:', message.id)
+      // console.log('onFinish called for:', message.id)
       setCompletedMessages(prev => ({ ...prev, [message.id]: message.content }))
       setFinishedAnimationIds(prev => new Set(prev).add(message.id))
       setHistoryIndex(-1)
@@ -80,14 +80,14 @@ export default function TerminalPortfolio() {
     } else {
       setIsFetching(prev => true)
       const messageId = Date.now().toString()
-      
+
       setErrorCommands(prev => ({
         ...prev,
         [messageId]: command
       }))
-      
+
       setDelayingIds(prev => new Set(prev).add(messageId))
-      
+
       setTimeout(() => {
         setDelayingIds(prev => {
           const newSet = new Set(prev);
@@ -95,9 +95,9 @@ export default function TerminalPortfolio() {
           return newSet
         });
       }, 3000)
-      
-      append({ 
-        role: 'user', 
+
+      append({
+        role: 'user',
         content: input,
         id: messageId
       })
@@ -175,6 +175,7 @@ export default function TerminalPortfolio() {
           animationCompletedIds={animationCompletedIds}
           setAnimationCompletedIds={setAnimationCompletedIds}
           completedMessages={completedMessages}
+          setInput={setInput}
         />
       </div>
       <Footer />

@@ -1,5 +1,6 @@
 import CustomTypingText from "./CustomTypingText";
 import { ScrollArea } from "./ui/scroll-area";
+import { parseLinks } from "@/lib/utils";
 
 const Terminal = ({
   localCommands,
@@ -15,16 +16,24 @@ const Terminal = ({
   errorCommands,
   delayingIds,
   finishedAnimationIds,
-  completedMessages
+  completedMessages,
+  setInput
 }) => {
   return (
     <div className="w-full lg:w-full flex flex-col p-4">
       {/* Navigation */}
-      <nav className="mb-4 shrink-0">
-        <div className="hidden lg:flex flex-wrap gap-x-4 text-sm">
+      <nav className="shrink-0">
+        <div className="hidden lg:flex flex-wrap text-sm">
           {localCommands.map((item) => (
-            <div key={item}>
-              {item} |
+            <div
+              key={item}
+              className="border-b border-green-500 pb-2 cursor-pointer hover:bg-green-900/30 hover:text-white transition-colors"
+              onClick={() => {
+                if (setInput) setInput(item);
+                if (focusInput) focusInput();
+              }}
+            >
+              <span className="px-1">{item}</span>|
             </div>
           ))}
         </div>
@@ -34,9 +43,9 @@ const Terminal = ({
       <ScrollArea className="flex-1 overflow-y-auto pr-2" onClick={focusInput}>
         {messages.map((m, index) => {
           const isUserMessagePending = errorCommands[m.id] && delayingIds.has(m.id)
-          const isInitialMessage = m.role === 'assistant' && !finishedAnimationIds.has(m.id) && ['0','1','2','3','4'].includes(m.id)
+          const isInitialMessage = m.role === 'assistant' && !finishedAnimationIds.has(m.id) && ['0', '1', '2', '3', '4'].includes(m.id)
           const isAnimationReady = m.role === 'assistant' && finishedAnimationIds.has(m.id)
-          
+
           return (
             <div key={m.id || index} className="whitespace-pre-wrap break-words">
               {m.role === "user" ? (
@@ -58,28 +67,28 @@ const Terminal = ({
                   )}
                 </>
               ) : (
-                  <>
-                    {isInitialMessage && (
-                      <p className="text-white text-sm">{m.content}</p>
-                    )}
-                    {isAnimationReady && (
-                      <p className="text-white text-sm">
-                        {completedMessages[m.id] ? (
-                          <CustomTypingText
-                            text={completedMessages[m.id]}
-                            messageId={m.id}
-                            typingSpeed={40}
-                            cursorCharacter="█"
-                            cursorClassName="text-[#39FF14] animate-pulse"
-                            showCursor={true}
-                            setIsFetching={setIsFetching}
-                          />
-                        ) : (
-                          m.content
-                        )}
-                      </p>
-                    )}
-                  </>
+                <>
+                  {isInitialMessage && (
+                    <p className="text-white text-sm">{parseLinks(m.content)}</p>
+                  )}
+                  {isAnimationReady && (
+                    <p className="text-white text-sm">
+                      {completedMessages[m.id] ? (
+                        <CustomTypingText
+                          text={completedMessages[m.id]}
+                          messageId={m.id}
+                          typingSpeed={15}
+                          cursorCharacter="█"
+                          cursorClassName="text-[#39FF14] animate-pulse"
+                          showCursor={true}
+                          setIsFetching={setIsFetching}
+                        />
+                      ) : (
+                        parseLinks(m.content)
+                      )}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )
