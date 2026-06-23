@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🚀 Terminal-Style AI Portfolio
 
-## Getting Started
+A fully interactive, terminal-inspired portfolio website built with modern web technologies and powered by AI. This project transforms a traditional portfolio into an engaging command-line experience where visitors can type commands or chat directly with an AI assistant to learn more about the developer.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **💻 Interactive Terminal UI**: A sleek, hacker-style command-line interface that feels like a real terminal.
+- **🤖 AI-Powered Assistant**: Integrated with **Google Gemini (2.5 Flash)** via the Vercel AI SDK. The AI acts as a personal assistant, answering questions and providing information based on the portfolio context.
+- **⚡ Command Execution**: Supports standard terminal commands (e.g., `help`, `about`, `projects`, `skills`, `experience`, `clear`, etc.) that can be typed or clicked.
+- **🔗 Smart Markdown Parsing**: Automatically converts markdown links from the AI's response into clickable HTML links right inside the terminal.
+- **🎮 3D Elements**: Incorporates 3D visuals using React Three Fiber and GSAP for a modern, dynamic touch (like the interactive lanyard).
+- **📱 Responsive Design**: Optimized for both desktop and mobile viewing with Tailwind CSS.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router, Turbopack)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai/) (`ai`, `@ai-sdk/react`, `@ai-sdk/google`)
+- **Components**: [Radix UI](https://www.radix-ui.com/) (for accessible UI primitives)
+- **3D & Animation**: `@react-three/fiber`, `@react-three/drei`, `gsap`, `meshline`
+- **Utilities**: `clsx`, `tailwind-merge`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Getting Started
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+Make sure you have Node.js or Bun installed on your machine. You will also need a **Google Gemini API Key**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repository-url>
+   cd my-portfolio
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies:**
+   Using `bun` (recommended) or `npm`/`yarn`/`pnpm`:
+   ```bash
+   bun install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Set up environment variables:**
+   Create a `.env` file in the root of the project and add your Google Gemini API key:
+   ```env
+   GOOGLE_API_KEY=your_gemini_api_key_here
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Run the development server:**
+   ```bash
+   bun run dev
+   ```
+
+5. **Open the app:**
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📁 Project Structure
+
+- `app/page.js` - Main entry point containing the terminal logic and layout.
+- `app/api/chat/route.js` - Serverless API route handling the Vercel AI SDK stream with Google Gemini.
+- `components/terminal.js` - The core terminal component rendering messages, handling inputs, and parsing links.
+- `components/CustomTypingText.js` - Handles the typewriter animation effect for AI responses.
+- `lib/portfolio-data.js` - Centralized data store (CV, projects, skills) and system prompt instructions for the AI.
+- `lib/utils.js` - Helper functions, including the custom Markdown link parser (`parseLinks`).
+
+## 💡 Customization
+
+To make this portfolio your own:
+1. Update the content in `lib/portfolio-data.js` with your personal information, work experience, projects, and custom links.
+2. The AI's `portfolioSystemPrompt` will automatically adapt to the new context and answer questions based on your provided data.
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
