@@ -147,36 +147,101 @@ export default function TerminalPortfolio() {
     }
   }
 
+  const [leftWidth, setLeftWidth] = useState(40) // Default 40% Lanyard, 60% Terminal
+  const [isDragging, setIsDragging] = useState(false)
+  const containerRef = useRef(null)
+
+  const handleMouseDown = (e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging || !containerRef.current) return
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100
+      // Clamp width between 20% and 70%
+      if (newWidth >= 20 && newWidth <= 70) {
+        setLeftWidth(newWidth)
+      }
+    }
+
+    const handleTouchMove = (e) => {
+      if (!isDragging || !containerRef.current || !e.touches[0]) return
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const newWidth = ((e.touches[0].clientX - containerRect.left) / containerRect.width) * 100
+      if (newWidth >= 20 && newWidth <= 70) {
+        setLeftWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
+      window.addEventListener('touchmove', handleTouchMove)
+      window.addEventListener('touchend', handleMouseUp)
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleMouseUp)
+    }
+  }, [isDragging])
+
   return (
     <div className="min-h-screen overflow-hidden bg-black font-mono">
       <Header />
-      <div className=" text-[#39FF14] font-mono flex h-[84vh]">
+      <div 
+        ref={containerRef} 
+        className={`text-[#39FF14] font-mono flex h-[84vh] relative ${isDragging ? 'select-none cursor-col-resize' : ''}`}
+      >
         {/* Left Column - Lanyard */}
-        <div className="bg-gradient-to-tl from-black to-gray-800 w-2/3 hidden lg:flex items-center justify-center">
+        <div 
+          className="bg-gradient-to-tl from-black to-gray-800 hidden lg:flex items-center justify-center relative overflow-hidden"
+          style={{ width: `${leftWidth}%` }}
+        >
           <Lanyard />
         </div>
-        <Separator orientation="vertical" className="bg-green-800" />
+
+        {/* Resizable Splitter Divider */}
+        <div
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleMouseDown}
+          className="hidden lg:flex w-2 bg-green-950/80 hover:bg-green-500 cursor-col-resize items-center justify-center transition-colors group relative z-20 border-x border-green-900/50"
+          title="Geser untuk mengatur lebar pembatas (Drag to resize)"
+        >
+          <div className="w-[2px] h-12 bg-green-500/50 group-hover:bg-green-300 rounded" />
+        </div>
 
         {/* Right Column - Terminal */}
-        <Terminal
-          localCommands={localCommands}
-          handleKeyDown={handleKeyDown}
-          focusInput={focusInput}
-          inputRef={inputRef}
-          messages={messages}
-          handleTerminalSubmit={handleTerminalSubmit}
-          input={input}
-          handleInputChange={handleInputChange}
-          isFetching={isFetching}
-          setIsFetching={setIsFetching}
-          errorCommands={errorCommands}
-          delayingIds={delayingIds}
-          finishedAnimationIds={finishedAnimationIds}
-          animationCompletedIds={animationCompletedIds}
-          setAnimationCompletedIds={setAnimationCompletedIds}
-          completedMessages={completedMessages}
-          setInput={setInput}
-        />
+        <div className="w-full lg:flex-1 h-full overflow-hidden flex flex-col">
+          <Terminal
+            localCommands={localCommands}
+            handleKeyDown={handleKeyDown}
+            focusInput={focusInput}
+            inputRef={inputRef}
+            messages={messages}
+            handleTerminalSubmit={handleTerminalSubmit}
+            input={input}
+            handleInputChange={handleInputChange}
+            isFetching={isFetching}
+            setIsFetching={setIsFetching}
+            errorCommands={errorCommands}
+            delayingIds={delayingIds}
+            finishedAnimationIds={finishedAnimationIds}
+            animationCompletedIds={animationCompletedIds}
+            setAnimationCompletedIds={setAnimationCompletedIds}
+            completedMessages={completedMessages}
+            setInput={setInput}
+          />
+        </div>
       </div>
       <Footer />
     </div>
