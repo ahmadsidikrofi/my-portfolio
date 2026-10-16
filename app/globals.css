@@ -140,6 +140,31 @@
   51%, 100% { opacity: 0; }
 }
 
+/* Custom terminal scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 1px solid rgba(20, 83, 45, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.7);
+}
+
+* {
+  scrollbar-color: rgba(34, 197, 94, 0.4) rgba(0, 0, 0, 0.6);
+  scrollbar-width: thin;
+}
+
 .lanyard-wrapper {
   position: relative;
   z-index: 0;
